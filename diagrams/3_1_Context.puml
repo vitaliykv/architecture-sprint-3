@@ -1,0 +1,13 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title Проект Smart Home
+
+Person(user, "Пользователь", "Управляет умным домом") 
+System(system, "Smart Home", "Управления отоплением и мониторинг температуры в умном доме")
+System_Ext(home, "Home", "Датчик температуры и устройство отопления  в умном доме")
+
+Rel(user, system, "включать/выключать отопление, устанавливать желаемую температуру и просматривать текущую температуру", "HTTP")
+Rel_R(system, home, "управления устройствами, запрос температуры", "HTTP")
+
+SHOW_LEGEND()
+@enduml
