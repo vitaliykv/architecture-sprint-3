@@ -1,0 +1,160 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+
+title Проект Smart Home
+
+Person(User, "Пользователь", "Управляет умным домом") 
+
+Container_Boundary(WebApp,"single-spa"){
+    Component(UserMF,"User-profile","")
+    Component(HouseMF,"House","")
+    Component(HeatingMF,"Heating","")
+    Component(TemperatureMF,"Temperature","")
+    Component(LightMF,"Light","")
+    Component(GatesMF,"Gates","")
+    Component(VideoMF,"Video","")
+    Component(RootApp,"RootApp","")
+}
+
+Container(ApiGateway, "ApiGateway", "Software System", "")
+
+Container(Broker, "Брокер сообщений"){
+    Component(MessageBroker,"Kafka","Брокер для обработки сообщений")
+}
+
+Rel_D(User, WbApp, "", "HTTP")
+Rel_D(WebApp, ApiGateway, "", "HTTP")
+
+
+Container_Boundary(UserSrv, "UserSrv", "Software System", "сервис управления пользователями"){
+    Component(UserAPI, "API")
+    Component(UserProfile, "UserProfile")
+    Component(UserDAL, "DAL")
+    Component(UserKafkaHandler, "KafkaHandler")
+    ComponentDb(UserDB, "Database", "PostgreSQL", "Данные пользователей")
+}
+
+Rel(ApiGateway, UserAPI, "", "HTTP")
+Rel(UserAPI, UserProfile, "", "")
+Rel(UserProfile, UserDAL, "", "")
+BiRel(UserKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(UserKafkaHandler, UserProfile, "", "")
+Rel(UserDAL, UserDB, "", "SQL")
+
+
+Container_Boundary(HouseSrv, "HouseSrv", "Software System", "сервис управления домами"){
+    Component(HouseAPI, "API")
+    Component(HouseService, "HouseService")
+    Component(HouseDAL, "DAL")
+    Component(HouseKafkaHandler, "KafkaHandler")
+    ComponentDb(HouseDB, "Database", "PostgreSQL", "Данные домов")
+}
+
+Rel(ApiGateway, HouseAPI, "", "HTTP")
+Rel(HouseAPI, HouseService, "", "")
+Rel(HouseService, HouseDAL, "", "")
+BiRel(HouseKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(HouseKafkaHandler, HouseService, "", "")
+Rel(HouseDAL, HouseDB, "", "SQL")
+
+
+Container_Boundary(SmartHome, "SmartHome"){
+    System_Ext(HomeHeating, "", "Устройство отопления")
+    System_Ext(homeTemperatureSensor, "", "Датчик температуры")
+    System_Ext(homeLight, "", "Устройство освещения")
+    System_Ext(homeGates, "", "Ворота")
+    System_Ext(homeVideoControl, "", "Устройство видео")
+}
+
+
+Container_Boundary(HeatingSrv, "HeatingSrv", "Software System", "сервис управления устройствами отопления"){
+    Component(HeatingAPI, "API")
+    Component(HeatingService, "HeatingService")
+    Component(HeatingDAL, "DAL")
+    Component(HeatingKafkaHandler, "KafkaHandler")
+    ComponentDb(HeatingDB, "Database", "PostgreSQL", "Данные устройств")
+}
+
+
+Rel(ApiGateway, HeatingAPI, "", "HTTP")
+Rel(HeatingAPI, HeatingService, "", "")
+Rel(HeatingService, HeatingDAL, "", "")
+BiRel(HeatingKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(HeatingKafkaHandler, HeatingService, "", "")
+Rel(HeatingDAL, HeatingDB, "", "SQL")
+Rel(HeatingService, HomeHeating, "", "HTTP")
+
+
+Container_Boundary(TemperatureSensorSrv, "TemperatureSensorSrv", "Software System", "сервис взаимодействие с датчиками температуры"){
+    Component(TemperatureSensorAPI, "API")
+    Component(TemperatureSensorService, "TemperatureSensorService")
+    Component(TemperatureSensorDAL, "DAL")
+    Component(TemperatureSensorKafkaHandler, "KafkaHandler")
+    ComponentDb(TemperatureSensorDB, "Database", "PostgreSQL", "Данные температуры")
+}
+
+Rel(ApiGateway, TemperatureSensorAPI, "", "HTTP")
+Rel(TemperatureSensorAPI, TemperatureSensorService, "", "")
+Rel(TemperatureSensorService, TemperatureSensorDAL, "", "")
+BiRel(TemperatureSensorKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(TemperatureSensorKafkaHandler, TemperatureSensorService, "", "")
+Rel(TemperatureSensorDAL, TemperatureSensorDB, "", "SQL")
+Rel(TemperatureSensorService, homeTemperatureSensor, "", "HTTP")
+
+
+
+Container_Boundary(LightSrv, "LightSrv", "Software System", "Управление освещением"){
+    Component(LightAPI, "API")
+    Component(LightService, "LightService")
+    Component(LightDAL, "DAL")
+    Component(LightKafkaHandler, "KafkaHandler")
+    ComponentDb(LightDB, "Database", "PostgreSQL", "Данные освещения")
+}
+
+Rel(ApiGateway, LightAPI, "", "HTTP")
+Rel(LightAPI, LightService, "", "")
+Rel(LightService, LightDAL, "", "")
+BiRel(LightKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(LightKafkaHandler, LightService, "", "")
+Rel(LightDAL, LightDB, "", "SQL")
+Rel(LightService, homeLight, "", "HTTP")
+
+
+Container_Boundary(GatesSrv, "GatesSrv", "Software System", "Управление воротами"){
+    Component(GatesAPI, "API")
+    Component(GatesService, "GatesService")
+    Component(GatesDAL, "DAL")
+    Component(GatesKafkaHandler, "KafkaHandler")
+    ComponentDb(GatesDB, "Database", "PostgreSQL", "Данные ворот")
+}
+
+Rel(ApiGateway, GatesAPI, "", "HTTP")
+Rel(GatesAPI, GatesService, "", "")
+Rel(GatesService, GatesDAL, "", "")
+BiRel(GatesKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(GatesKafkaHandler, GatesService, "", "")
+Rel(GatesDAL, GatesDB, "", "SQL")
+Rel(GatesService, homeGates, "", "HTTP")
+
+
+Container_Boundary(VideoControlSrv, "VideoControlSrv", "Software System", "Управление видеокамерами"){
+    Component(VideoControlAPI, "API")
+    Component(VideoControlService, "VideoControlService")
+    Component(VideoControlDAL, "DAL")
+    Component(VideoControlKafkaHandler, "KafkaHandler")
+    ComponentDb(VideoControlDB, "Database", "PostgreSQL", "Данные видео")
+}
+
+Rel(ApiGateway, VideoControlAPI, "", "HTTP")
+Rel(VideoControlAPI, VideoControlService, "", "")
+Rel(VideoControlService, VideoControlDAL, "", "")
+BiRel(VideoControlKafkaHandler, MessageBroker, "", "Сообщения")
+BiRel(VideoControlKafkaHandler, VideoControlService, "", "")
+Rel(VideoControlDAL, VideoControlDB, "", "SQL")
+Rel(VideoControlService, homeVideoControl, "", "HTTP")
+
+
+@enduml

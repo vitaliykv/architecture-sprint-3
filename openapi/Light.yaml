@@ -1,0 +1,233 @@
+openapi: 3.0.3
+info:
+  title: Сервис управления устройствами отопления
+  description: сервис управления устройствами отопления (включать/выключать отопление, устанавливать желаемую температуру)
+  version: 1.0.11
+servers:
+  - url: https://localhost:8082/api/v1
+paths: 
+  /heatings:
+    put:
+      tags:
+        - Heating
+      summary: Update an existing Heating
+      description: Update an existing Heating by Id
+      operationId: updateHeating
+      security: 
+        - heating_auth: 
+          - write_Heating
+      requestBody:
+        description: Update an existent Heating 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Heating'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Heating'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Heating'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Heating'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Heating'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Heating not found
+        '422':
+          description: Validation exception
+        '500':
+          description: Server exception
+    post:
+      tags:
+        - Heating
+      summary: add Heating
+      description: add new Heating
+      operationId: addHeating
+      security: 
+        - heating_auth: 
+          - write_Heating
+      requestBody:
+        description: add Heating 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Heating'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Heating'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Heating'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Heating'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Heating'
+        '422':
+          description: Validation exception
+        '500':
+          description: Server exception
+    get:
+      tags:
+        - Heating
+      summary: Returns array Heating by User
+      description: Returns array Heating by User
+      operationId: getHeatingByUser
+      security: 
+        - heating_auth: 
+          - read_Heating
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Heating'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Heating'
+        '500':
+          description: Server exception
+  /heatings/{HeatingId}:
+    get:
+      tags:
+        - Heating
+      summary: Find Heating by ID
+      description: Returns a single SmartHome
+      operationId: getHeatingById
+      security: 
+        - heating_auth: 
+          - read_Heating
+      parameters:
+        - name: HeatingId
+          in: path
+          description: ID of HeatingId to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Heating'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Heating'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: SmartHome not found
+        '500':
+          description: Server exception
+    delete:
+      tags:
+        - Heating
+      summary: Deletes a Heating
+      description: delete a Heating
+      operationId: deleteHeating
+      security: 
+        - heating_auth: 
+          - delete_Heating
+      parameters:
+        - name: HeatingId
+          in: path
+          description: ID of HeatingId to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Invalid HeatingId
+        '500':
+          description: Server exception
+
+components:
+  schemas:
+    Heating:
+      required:
+        - Name
+        - SmartHomeId
+      type: object
+      properties:
+        Id:
+          description: The unique identifier for Heating. (A UUID specified by RFC4122)
+          type: string
+          format: uuid
+          example: 1234f71f-22ae-43b4-92f3-f4af77cdf777
+        SmartHomeId:
+          description: The unique identifier for SmartHome. (A UUID specified by RFC4122)
+          type: string
+          format: uuid
+          example: 1234f71f-22ae-43b4-92f3-f4af77cdf772
+        Name:
+          type: string
+          example: Устройство отопления 
+        IsEnabled:
+          type: boolean 
+          description: включать/выключать отопление 
+          example: true
+        DesiredTemperature:
+          type: integer
+          description: желаемая температура 
+          example: 25
+      xml:
+        name: Heating
+    ApiResponse:
+      type: object
+      properties:
+        HeatingId:
+          type: string
+          format: uuid
+        Message:
+          type: string
+      xml:
+        name: ApiResponse
+  examples:
+        ApiResponse:
+          value:
+            HeatingId: 1234f71f-22ae-43b4-92f3-f4af77cdf444
+            Message:  delete is successful
+
+  securitySchemes:
+    heating_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:8089/oauth/authorize
+          scopes:
+            write_Heating: modify Heating
+            read_Heating: read your Heating
+            delete_Heating: delete your Heating

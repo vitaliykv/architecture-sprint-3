@@ -1,0 +1,68 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Проект Smart Home
+
+class User as "Пользователь" {
+ +UUID Id
+ ..
+ +String Name
+ +Sytring Email
+}
+
+class SmartHome as "Умный дом"{
+    +UUID Id
+    ..
+    +UUID UserId
+    +Sytring Name
+    +Sytring Address
+}
+
+class Heating as "Устройство отопления"{
+    +UUID Id
+    ..
+    +UUID SmartHomeId
+    +Sytring Name
+}
+
+class TemperatureSensor as "Датчик температуры"{
+    +UUID Id
+    ..
+    +UUID SmartHomeId
+    +Sytring Name
+}
+
+class Light as "Устройство освещения"{
+    +UUID Id
+    ..
+    +UUID SmartHomeId
+    +Sytring Name
+}
+
+class Gates as "Ворота"{
+    +UUID Id
+    ..
+    +UUID SmartHomeId
+    +Sytring Name
+}
+
+class Video as "Видеокамера"{
+    +UUID Id
+    ..
+    +UUID SmartHomeId
+    +Sytring Name
+}
+
+
+User::Id *-- SmartHome::UserId
+SmartHome::Id *-- Heating::SmartHomeId
+SmartHome::Id *-- TemperatureSensor::SmartHomeId
+SmartHome::Id *-- Light::SmartHomeId
+SmartHome::Id *-- Gates::SmartHomeId
+SmartHome::Id *-- Video::SmartHomeId
+
+
+
+@enduml

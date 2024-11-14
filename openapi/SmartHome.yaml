@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: Сервис управления домами
+  description: сервис управления домами (новое подключение к дому, редактирование, удаление)
+  version: 1.0.11
+servers:
+  - url: https://localhost:8080/api/v1
+paths: 
+  /smarthomes:
+    put:
+      tags:
+        - SmartHome
+      summary: Update an existing SmartHome
+      description: Update an existing SmartHome by Id
+      operationId: updateSmartHome
+      security: 
+        - smart_home_auth: 
+          - write_SmartHome
+      requestBody:
+        description: Update an existent smarthome 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartHome'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/SmartHome'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SmartHome'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmartHome'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SmartHome'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: SmartHome not found
+        '422':
+          description: Validation exception
+        '500':
+          description: Server exception
+    post:
+      tags:
+        - SmartHome
+      summary: add SmartHome
+      description: add new SmartHome
+      operationId: addSmartHome
+      security: 
+        - smart_home_auth: 
+          - write_SmartHome
+      requestBody:
+        description: add smarthome 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartHome'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/SmartHome'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SmartHome'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmartHome'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SmartHome'
+        '422':
+          description: Validation exception
+        '500':
+          description: Server exception
+    get:
+      tags:
+        - SmartHome
+      summary: Returns array SmartHome by User
+      description: Returns array SmartHome by User
+      operationId: getSmartHomeByUser
+      security: 
+        - smart_home_auth: 
+          - read_SmartHome
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SmartHome'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SmartHome'
+        '500':
+          description: Server exception
+  /smarthomes/{SmartHomeId}:
+    get:
+      tags:
+        - SmartHome
+      summary: Find SmartHome by ID
+      description: Returns a single SmartHome
+      operationId: getSmartHomeById
+      security: 
+        - smart_home_auth: 
+          - read_SmartHome
+      parameters:
+        - name: SmartHomeId
+          in: path
+          description: ID of SmartHomeId to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmartHome'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SmartHome'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: SmartHome not found
+        '500':
+          description: Server exception
+    delete:
+      tags:
+        - SmartHome
+      summary: Deletes a SmartHome
+      description: delete a SmartHome
+      operationId: deleteSmartHome
+      security: 
+        - smart_home_auth: 
+          - delete_SmartHome
+      parameters:
+        - name: SmartHomeId
+          in: path
+          description: ID of SmartHomeId to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Invalid SmartHomeId
+        '500':
+          description: Server exception
+
+components:
+  schemas:
+    SmartHome:
+      required:
+        - Name
+        - UserId
+      type: object
+      properties:
+        Id:
+          description: The unique identifier for SmartHome. (A UUID specified by RFC4122)
+          type: string
+          format: uuid
+          example: 1234f71f-22ae-43b4-92f3-f4af77cdf777
+        UserId:
+          description: The unique identifier for user. (A UUID specified by RFC4122)
+          type: string
+          format: uuid
+          example: 1234f71f-22ae-43b4-92f3-f4af77cdf772
+        Name:
+          type: string
+          example: Умный дом
+        Address:
+          type: string
+          example: улица Лизюкова
+      xml:
+        name: SmartHome
+    ApiResponse:
+      type: object
+      properties:
+        SmartHomeId:
+          type: string
+          format: uuid
+        Message:
+          type: string
+      xml:
+        name: ApiResponse
+  examples:
+        ApiResponse:
+          value:
+            SmartHomeId: 1234f71f-22ae-43b4-92f3-f4af77cdf444
+            Message:  delete is successful
+
+  securitySchemes:
+    smart_home_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:8089/oauth/authorize
+          scopes:
+            write_SmartHome: modify SmartHome
+            read_SmartHome: read your SmartHome
+            delete_SmartHome: delete your SmartHome

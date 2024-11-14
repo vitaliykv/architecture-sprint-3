@@ -1,0 +1,69 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Проект Smart Home
+
+Person(user, "Пользователь", "Управляет умным домом") 
+
+Container(webApp,"single-spa")
+Container(ApiGateway, "ApiGateway", "Software System", "")
+Container(MessageBroker, "MessageBroker", "Kafka", "")
+
+Rel(user, webApp, "", "HTTP")
+Rel(webApp, ApiGateway, "", "HTTP")
+
+Container(UserSrv, "UserSrv", "Software System", "сервис управления пользователями")
+Container(UserDB, "Database", "PostgreSQL", "Данные пользователей")
+Rel(UserSrv, UserDB, "", "SQL")
+BiRel(UserSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, UserSrv, "", "HTTP")
+
+Container(HouseSrv, "HouseSrv", "Software System", "сервис управления домами")
+Container(HouseDB, "Database", "PostgreSQL", "Данные домов")
+Rel(HouseSrv, HouseDB, "", "SQL")
+BiRel(HouseSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, HouseSrv, "", "HTTP")
+
+Container(HeatingSrv, "HeatingSrv", "Software System", "сервис управления устройствами отопления")
+Container(HeatingDB, "Database", "PostgreSQL", "Данные устройств")
+System_Ext(HomeHeating, "Home", "Датчик температуры")
+Rel(HeatingSrv, HeatingDB, "", "SQL")
+BiRel(HeatingSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, HeatingSrv, "", "HTTP")
+Rel(HeatingSrv, HomeHeating, "", "HTTP")
+
+Container(TemperatureSensorSrv, "TemperatureSensorSrv", "Software System", "сервис взаимодействие с датчиками температуры")
+Container(TemperatureSensorDB, "Database", "PostgreSQL", "Данные температуры")
+System_Ext(homeTemperatureSensor, "Home", "Устройство отопления")
+Rel(TemperatureSensorSrv, TemperatureSensorDB, "", "SQL")
+BiRel(TemperatureSensorSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, TemperatureSensorSrv, "", "HTTP")
+Rel(TemperatureSensorSrv, homeTemperatureSensor, "", "HTTP")
+
+Container(LightSrv, "LightSrv", "Software System", "Управление освещением")
+Container(LightDB, "Database", "PostgreSQL", "Данные освещения")
+System_Ext(homeLight, "Home", "Устройство освещения")
+Rel(LightSrv, LightDB, "", "SQL")
+BiRel(LightSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, LightSrv, "", "HTTP")
+Rel(LightSrv, homeLight, "", "HTTP")
+
+Container(GatesSrv, "GatesSrv", "Software System", "Управление воротами")
+Container(GatesDB, "Database", "PostgreSQL", "Данные ворот")
+System_Ext(homeGates, "Home", "Ворота")
+Rel(GatesSrv, GatesDB, "", "SQL")
+BiRel(GatesSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, GatesSrv, "", "HTTP")
+Rel(GatesSrv, homeGates, "", "HTTP")
+
+Container(VideoControlSrv, "VideoControlSrv", "Software System", "Управление видеокамерами")
+Container(VideoControlDB, "Database", "PostgreSQL", "Данные видео")
+System_Ext(homeVideoControl, "Home", "Устройство видео")
+Rel(VideoControlSrv, VideoControlDB, "", "SQL")
+BiRel(VideoControlSrv, MessageBroker, "", "Сообщения")
+Rel(ApiGateway, VideoControlSrv, "", "HTTP")
+Rel(VideoControlSrv, homeVideoControl, "", "HTTP")
+
+
+@enduml
